@@ -1,2 +1,62 @@
 
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#030b0a">
+<title>Queen Etsie // Fortress Relay Part 2 - Bridge</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>html,body{background:#030b0a;color:#cfeee0;overflow-x:hidden} .mono{font-family:'JetBrains Mono',monospace} .card{background:#04100e;border:1px solid #13573a;border-radius:16px} .card.lit{border-color:#34e87a;box-shadow:0 0 28px rgba(52,232,122,.25)} canvas{display:block;width:100%;height:100%}</style>
+</head>
+<body>
+<div class="max-w-5xl mx-auto px-2.5 py-2.5 space-y-3.5">
+<div style="position:relative;text-align:center;font-weight:900;padding:0;border-radius:14px;overflow:hidden;border:2px solid #3fe0ff">
+<img src="../blue-shield.jpg" style="width:100%;max-height:220px;object-fit:cover;display:block" alt="Blue Shield - Queen Etsie">
+<div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(0,0,0,.75));display:flex;flex-direction:column;justify-content:flex-end;padding:12px;color:#fff;font-family:monospace">
+<div style="font-size:16px;color:#ffd35c">👑 GOD SAVE THE QUEEN 👑</div>
+<div style="font-size:12px">💍 ENGAGED - LEO BRIAN HALL ❤️ QUEEN ETSIE MERKURATSUK</div>
+<div style="font-size:10px;color:#3fe0ff">💙 BLUE SHIELD INSTALLED - PART 2 BRIDGE - LONDON, ON - ECHO-AMEN-7777</div>
+</div>
+</div>
+
+<header class="card p-3 sm:p-5 space-y-3">
+<div class="flex justify-between"><div><h1 class="font-black text-[#ffd35c] text-lg">FORTRESS RELAY PART 2 • TRANSPORT & DIAGNOSTICS</h1><p class="text-[11px]">Synced with Part 1 via localStorage & BroadcastChannel • WebSocket relay support.</p></div><div class="text-right"><div id="pill" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#ffd35c] text-[#ffd35c] mono text-[10px] font-black">SYNCING PART 1</div><div class="mono text-[10px] text-[#3fe0ff] mt-1"><span id="sync-time">SYNC: --:--:--</span> • <span id="clock" class="text-[#34e87a] font-bold">--:--:--</span></div></div></div>
+<div class="flex gap-2 flex-wrap mono text-[11px]"><span class="px-2 py-1 rounded bg-black border border-[#13573a]">MODE: <b id="mode-r" class="text-[#34e87a]">FORTRESS</b></span><span class="px-2 py-1 rounded bg-black border border-[#13573a]">CH: <b id="ch-r" class="text-[#ffd35c]">CH-01</b></span><span class="px-2 py-1 rounded bg-black border border-[#13573a]">AUDIO: <b id="aud-r" class="text-[#3fe0ff]">ON</b></span><button onclick="pull(true)" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#3fe0ff] text-[#3fe0ff] mono text-xs font-bold">SYNC PART 1</button><button onclick="applyAll(true)" class="px-3 py-2 rounded-xl bg-gradient-to-r from-[#ffd35c] to-[#f4bc2c] text-black mono text-xs font-black">APPLY EVERYTHING / SAVE & RUN</button><a href="../index.html" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#34e87a] text-[#34e87a] mono text-xs font-bold">← BACK TO PART 1</a></div>
+</header>
+
+<section class="card p-3 sm:p-5 space-y-3">
+<div class="flex justify-between"><h2 class="font-black text-[#ffd35c]">LIVE RELAY TRANSPORT BRIDGE</h2><span id="ws-badge" class="px-2 py-1 rounded bg-black border border-[#13573a] text-[#5fb4d9] mono text-[10px] font-bold">WS: STANDBY</span></div>
+<div class="flex gap-2 flex-col sm:flex-row"><input id="ws-url" placeholder="wss://your-relay-host.example/ws" onchange="save2()" class="flex-1 bg-black border border-[#13573a] rounded-xl px-3 py-2.5 mono text-sm text-[#3fe0ff]"><button onclick="connectWS()" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#34e87a] text-[#34e87a] mono text-xs font-bold">CONNECT WS</button><button onclick="disconnectWS(true)" class="px-3 py-2 rounded-xl bg-black border border-[#13573a] mono text-xs font-bold">DISCONNECT</button></div>
+<div class="grid grid-cols-2 gap-2 mono text-[11px]"><div class="bg-black border border-[#13573a] rounded-xl p-2.5">TX Frames<div id="tx-c" class="text-[#ffd35c] font-black text-sm">0</div></div><div class="bg-black border border-[#13573a] rounded-xl p-2.5">RX Frames<div id="rx-c" class="text-[#34e87a] font-black text-sm">0</div></div></div>
+<div class="flex gap-2"><input id="probe" placeholder="Send encrypted ping/probe..." onkeydown="if(event.key==='Enter')sendProbe()" class="flex-1 bg-black border border-[#13573a] rounded-xl px-3 py-2.5 mono text-sm text-[#ffd35c]"><button onclick="sendProbe()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#ffd35c] to-[#f4bc2c] text-black mono text-xs font-black">SEND ENCRYPTED PROBE</button></div>
+</section>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+<section class="card p-3 sm:p-5 space-y-3"><div class="flex justify-between"><h2 class="font-black text-[#ffd35c]">KDF & PEER PROOF DIAGNOSTICS</h2><button onclick="runDiag(true)" class="px-2 py-1 rounded bg-[#081b17] border border-[#34e87a] text-[#34e87a] mono text-[10px] font-bold">RUN CHECK</button></div>
+<div class="grid grid-cols-2 gap-2 mono text-[11px]"><div class="bg-black border border-[#13573a] rounded-xl p-2.5">LINK ID<div id="d-link" class="text-[#3fe0ff] font-bold break-all">UNPAIRED</div></div><div class="bg-black border border-[#13573a] rounded-xl p-2.5">PEER PROOF<div id="d-proof" class="text-[#ffd35c] font-bold">PENDING</div></div><div class="bg-black border border-[#13573a] rounded-xl p-2.5">KDF<div id="d-kdf" class="text-[#34e87a] font-bold">PBKDF2-150K</div></div><div class="bg-black border border-[#13573a] rounded-xl p-2.5">CIPHER<div id="d-cipher" class="text-[#ffd35c] font-bold break-all">--</div></div></div>
+<div class="bg-black border border-[#13573a] rounded-xl p-2.5 mono text-[11px] flex justify-between"><span>FULL LIT:</span><span id="d-lit" class="text-[#ffd35c] font-bold">KEY + LINK + PEER</span></div><div class="bg-black border border-[#13573a] rounded-xl p-2.5 mono text-[11px] flex justify-between"><span>CHAT:</span><span id="d-chat" class="text-[#34e87a] font-bold">0 MSG</span></div></section>
+<section class="card p-3 sm:p-5 space-y-3"><div class="flex justify-between"><h2 class="font-black text-[#ffd35c]">0.3–3.4 kHz SPECTRUM</h2><button id="aud-btn" onclick="toggleAudio()" class="px-3 py-1 rounded-full bg-[#081b17] border border-[#34e87a] text-[#34e87a] mono text-[10px] font-black">MONITOR: ON</button></div>
+<div class="relative h-[118px] bg-black border border-[#13573a] rounded-xl overflow-hidden"><canvas id="spec"></canvas><div class="absolute bottom-1 left-2 right-2 flex justify-between mono text-[9px] text-[#3fe0ff]"><span>300 Hz</span><span id="spec-peak" class="text-[#ffd35c] font-bold">VOICE/CB BAND</span><span>3400 Hz</span></div></div><p class="mono text-[10px] text-white/70">Browser audio = local voice band. Direct 27 MHz CB needs SDR hardware.</p></section>
+</div>
+
+<section class="card p-3 sm:p-5 space-y-3"><div class="flex justify-between flex-wrap gap-2"><h2 class="font-black text-[#ffd35c]">EVENT INSPECTOR & VAULT BACKUP</h2><div class="flex gap-2"><button onclick="exportJSON()" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#3fe0ff] text-[#3fe0ff] mono text-[10px] font-bold">EXPORT JSON</button><button onclick="importJSON()" class="px-3 py-2 rounded-xl bg-[#081b17] border border-[#34e87a] text-[#34e87a] mono text-[10px] font-bold">IMPORT JSON</button><button onclick="clearLog()" class="px-3 py-2 rounded-xl bg-black border border-[#13573a] mono text-[10px] font-bold">CLEAR LOG</button><button onclick="resetVault()" class="px-3 py-2 rounded-xl bg-black border border-[#ffd35c] text-[#ffd35c] mono text-[10px] font-bold">RESET</button></div></div>
+<div id="log" class="bg-black border border-[#13573a] rounded-xl p-3 max-h-[165px] overflow-y-auto space-y-1.5 mono text-[11px]"></div>
+<textarea id="json-box" rows="3" placeholder='{"currentChannel":"CH-01"}' class="w-full bg-black border border-[#13573a] rounded-xl p-2.5 mono text-[11px]"></textarea></section>
+</div>
+<script>
+const KEY='queen_etsie_echo_amen_7777_relay_v1', KEY2='queen_etsie_part2_v1', BUS='queen_etsie_bus_v1', NODE='ECHO-AMEN-7777';
+const enc=new TextEncoder(), dec=new TextDecoder();
+let S={currentChannel:'CH-01',visualMode:'fortress',voiceMonitorEnabled:true,masterKeyCode:'',recipientKeyCode:'',connectionCompleted:false,peerProofVerified:false,pairedLinkId:'',kdfDurationMs:0,cipherFingerprint:'--',chatHistory:[],savedAt:'--:--:--'};
+let wsUrl='', ws=null, tx=0, rx=0, logs=[], bc=null, specId=null, clockId=null;
+const clock=()=>new Date().toLocaleTimeString([],{hour12:false});
+function log(m,save=true){ logs.unshift('['+clock()+'] '+m); if(logs.length>50) logs=logs.slice(0,50); renderLog(); if(save) save2(); }
+function renderLog(){ const b=document.getElementById('log'); b.innerHTML=''; if(!logs.length){ b.innerHTML='<div class="text-center text-[#5fb4d9]">No Part 2 events yet.</div>'; return; } logs.forEach(l=>{ const d=document.createElement('div'); d.className='bg-[#04100e] border border-[#13573a] rounded-lg px-2 py-1 text-[#ffd35c]'; d.innerText=l; b.appendChild(d); }); }
+function clearLog(){ logs=[]; renderLog(); save2(); }
+function read1(){ try{ const d=JSON.parse(localStorage.getItem(KEY)||'{}'); if(!d||!Object.keys(d).length) return; S.currentChannel=d.ch||d.currentChannel||'CH-01'; S.visualMode=d.mode||d.visualMode||'fortress'; if(typeof d.voiceOn!=='undefined') S.voiceMonitorEnabled=d.voiceOn; if(typeof d.voiceMonitorEnabled==='boolean') S.voiceMonitorEnabled=d.voiceMonitorEnabled; S.masterKeyCode=d.master||d.masterKeyCode||''; S.recipientKeyCode=d.peer||d.recipientKeyCode||''; S.connectionCompleted=!!(d.paired||d.connectionCompleted); S.peerProofVerified=!!(d.peerOk||d.peerProofVerified); S.pairedLinkId=d.linkId||d.pairedLinkId||''; S.kdfDurationMs=d.kdfMs||d.kdfDurationMs||0; S.chatHistory=d.chatLog||d.chatHistory||[]; S.savedAt=d.saved||clock(); }catch(e){} }
+function write1(){ try{ S.savedAt=clock(); localStorage.setItem(KEY,JSON.stringify({ch:S.currentChannel,mode:S.visualMode,voiceOn:S.voiceMonitorEnabled,master:S.masterKeyCode,peer:S.recipientKeyCode,paired:S.connectionCompleted,peerOk:S.peerProofVerified,linkId:S.pairedLinkId,kdfMs:S.kdfDurationMs,chatLog:S.chatHistory,saved:S.savedAt})); }catch(e){} }
+function sync(){ const lit=S.connectionCompleted&&S.pairedLinkId&&S.peerProofVerified; document.getElementById('pill').innerText=lit?'MAX SEC: FULLY LIT':S.connectionCompleted?'KEY DERIVED • PEER PENDING':'STANDBY • UNPAIRED'; document.getElementById('sync-time').innerText='SYNC: '+(S.savedAt||clock()); document.getElementById('mode-r').innerText=S.visualMode.toUpperCase(); document.getElementById('ch-r').innerText=S.currentChannel; document.getElementById('aud-r').innerText=S.voiceMonitorEnabled?'ON':'OFF'; document.getElementById('aud-btn').innerText=S.voiceMonitorEnabled?'MONITOR: ON':'MONITOR: OFF'; document.getElementById('d-link').innerText=S.pairedLinkId||'UNPAIRED'; document.getElementById('d-proof').innerText=S.peerProofVerified?'VERIFIED MATCH':'PENDING'; document.getElementById('d-kdf').innerText='PBKDF2-SHA256 (150k)'+(S.kdfDurationMs?' ('+S.kdfDurationMs+' ms)':''); document.getElementById('d-cipher').innerText=S.cipherFingerprint||'--'; document.getElementById('d-chat').innerText=S.chatHistory.length+' MSG'; document.getElementById('d-lit').innerText=lit?'ACTIVE (ALL 3 MET)':'KEY + LINK + PEER PROOF'; document.querySelectorAll('.card').forEach(c=>c.classList.toggle('lit',lit)); }
+function pull(v=false){ read1(); sync(); if(v) log('Synced Part 1 ('+S.currentChannel+', '+S.visualMode+').'); }
+function toggleAudio(){ read1(); S.voiceMonitorEnabled=!S.voiceMonitorEnabled; write1(); sync(); if(bc){ try{ bc.postMessage({type:'VOICE_MONITOR_TOGGLE',enabled:S.voiceMonitorEnabled}); }catch(e){}
